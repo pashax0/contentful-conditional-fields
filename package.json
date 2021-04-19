@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@contentful/app-sdk": "^3.33.0",
+    "@contentful/field-editor-radio": "^0.12.1",
+    "@contentful/field-editor-reference": "^2.13.1",
     "@contentful/field-editor-single-line": "^0.14.1",
     "@contentful/field-editor-test-utils": "^0.11.1",
     "@contentful/forma-36-fcss": "^0.3.1",
