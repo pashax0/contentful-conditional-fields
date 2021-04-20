@@ -6,11 +6,35 @@ interface EditorProps {
   sdk: EditorExtensionSDK;
 }
 
+type SectionType = string;
+
 {/*  @ts-ignore*/}
-const renderFieldsOnlyForType = (type: string) => {
+const renderFieldsOnlyForType = (type: SectionType, sdk: EditorProps.sdk) => {
     switch (type) {
         case 'one': return (
-            <Paragraph>Fields for one</Paragraph>
+            <>
+                <Paragraph>Fields for one</Paragraph>
+                <Dropdown
+                    // isOpen
+                    // onClose={() => setOpen(false)}
+                    // toggleElement={
+                    //     <Button
+                    //         size="small"
+                    //         buttonType="muted"
+                    //         indicateDropdown
+                    //         onClick={() => setOpen(!isOpen)}
+                    //     >
+                    //         {dropdownValue}
+                    //     </Button>
+                >
+                    <DropdownList>
+                        <DropdownListItem>start</DropdownListItem>
+                        <DropdownListItem>center</DropdownListItem>
+                        <DropdownListItem>end</DropdownListItem>
+                    </DropdownList>
+                </Dropdown>
+                <Paragraph>{JSON.stringify(sdk.entry.fields.objectData.getValue().style)}</Paragraph>
+            </>
         )
         case 'two': return (
             <Paragraph>Fields for two</Paragraph>
@@ -27,6 +51,8 @@ const Entry = (props: EditorProps) => {
     const [isOpen, setOpen] = React.useState(false);
     const [dropdownValue, updateDropdownValue] = React.useState(sdk.entry.fields.type.getValue() || 'Choose correct section type');
     const dropdownFieldValidations = sdk.entry.fields.type.validations[0];
+    {/*  @ts-ignore*/}
+    const dropdownItems: Array<object> = dropdownFieldValidations["in"];
 
     return (
       <div style={{maxWidth: '95%', margin: "10px auto"}}>
@@ -40,7 +66,8 @@ const Entry = (props: EditorProps) => {
             onChange={e => sdk.entry.fields.name.setValue(e.target.value)}
         />
           <Paragraph>Type</Paragraph>
-          <Dropdown isOpen={isOpen}
+          <Dropdown
+            isOpen={isOpen}
             onClose={() => setOpen(false)}
             toggleElement={
                 <Button
@@ -53,8 +80,8 @@ const Entry = (props: EditorProps) => {
                 </Button>
             }>
               <DropdownList>
-                  {/*  @ts-ignore*/}
-                  {dropdownFieldValidations["in"].map(item => (
+
+                  {dropdownItems.map(item => (
                       <DropdownListItem onClick={e => {
                           sdk.entry.fields.type.setValue(item);
                           updateDropdownValue(item);
@@ -69,13 +96,15 @@ const Entry = (props: EditorProps) => {
                   {/*</DropdownListItem>*/}
               </DropdownList>
           </Dropdown>
-          <Flex flexDirection="column" marginTop="spacingL">
+          <Flex flexDirection="column" marginTop="spacingL" marginBottom="spacingXl">
               <Paragraph>Fields for this section type:</Paragraph>
-              {renderFieldsOnlyForType(dropdownValue)}
+              {renderFieldsOnlyForType(dropdownValue, sdk)}
           </Flex>
         {/*<Paragraph></Paragraph>*/}
         {/*  @ts-ignore*/}
-        <Paragraph>{JSON.stringify(sdk.entry.fields.type.id)}</Paragraph>
+        {/*<Paragraph>{JSON.stringify(sdk.editor.editorInterface.controls?.find(control => control.fieldId === "paragraph"))}</Paragraph>*/}
+        {/*  @ts-ignore*/}
+        <Paragraph>{JSON.stringify(sdk.entry.fields.type.validations[0]["in"])}</Paragraph>
       </div>
   )
 };
