@@ -2,6 +2,8 @@ import React from 'react';
 import { TextInput, Paragraph, Dropdown, DropdownList, DropdownListItem, Button, Flex } from '@contentful/forma-36-react-components';
 import { EditorExtensionSDK } from '@contentful/app-sdk';
 import Page from "./Page";
+import {SingleLineEditor} from "../packages/single-line";
+import {NumberEditor} from "../packages/number/NumberEditor";
 
 interface EditorProps {
   sdk: EditorExtensionSDK;
@@ -12,9 +14,36 @@ type SectionType = string;
 {/*  @ts-ignore*/}
 const renderFieldsForType = (renderedFields: Array<any>, sdk: EditorProps.sdk) => {
     return renderedFields.map(field => {
-        return (
-            <Paragraph>{JSON.stringify(sdk.entry.fields[field])}</Paragraph>
-        )
+        const fieldData = sdk.entry.fields[field];
+        const localizedFieldData = fieldData.getForLocale(sdk.locales.default);
+
+        if (field === 'onlyForOne') {
+            const widgetId = sdk.editor.editorInterface?.controls?.find(
+                // @ts-ignore
+                ({ fieldId }) => fieldId === field
+            )
+
+            // @ts-ignore
+            return (
+                <>
+                    <Paragraph>{`Here: ${localizedFieldData.getValue()}`}</Paragraph>
+                    <SingleLineEditor locales={sdk.locales} field={localizedFieldData} />
+                </>
+            )
+        }
+        if (field === 'number') {
+            return (
+                <>
+                    {/*<Paragraph>{JSON.stringify(localizedFieldData)}</Paragraph>*/}
+                    <NumberEditor field={localizedFieldData} />
+                </>
+            )
+        }
+        else {
+            return (
+                <Paragraph>no fields</Paragraph>
+            )
+        }
     })
     // switch (type) {
     //     case 'one': return (

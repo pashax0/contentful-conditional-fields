@@ -72,11 +72,12 @@ const Field = (props: FieldProps) => {
   // -> https://www.contentful.com/developers/docs/extensibility/field-editors/
   // return <Paragraph>Hello Entry Field Component</Paragraph>;
   return (
-      <div style={{height: "500px"}}>
-
-        {typeValue && <Paragraph>{renderCorrectTypeDescription(typeValue)}</Paragraph>}
-          <Paragraph>{JSON.stringify(sdk.entry.fields['name'])}</Paragraph>
-      </div>
+      // <div style={{height: "500px"}}>
+      //
+      //   {typeValue && <Paragraph>{renderCorrectTypeDescription(typeValue)}</Paragraph>}
+      //     <Paragraph>{JSON.stringify(sdk.entry.fields['name'])}</Paragraph>
+      // </div>
+    <Paragraph>Hello Entry Field Component</Paragraph>
   )
 };
 
