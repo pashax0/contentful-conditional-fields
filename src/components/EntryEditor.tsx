@@ -1,9 +1,6 @@
 import React from 'react';
 import { TextInput, Paragraph, Dropdown, DropdownList, DropdownListItem, Button, Flex } from '@contentful/forma-36-react-components';
 import { EditorExtensionSDK } from '@contentful/app-sdk';
-import Page from "./Page";
-import {SingleLineEditor} from "../packages/single-line";
-import {NumberEditor} from "../packages/number/NumberEditor";
 
 import {Field as BaseField, FieldWrapper} from "@contentful/default-field-editors";
 import { FieldExtensionSDK } from "@contentful/app-sdk";
@@ -15,109 +12,39 @@ interface EditorProps {
 type SectionType = string;
 
 {/*  @ts-ignore*/}
-const renderFieldsForType = (renderedFields: Array<any>, sdk: EditorProps.sdk) => {
+const renderFields = (renderedFields: Array<string>, sdk: EditorProps.sdk) => {
     return renderedFields.map(field => {
         const fieldData = sdk.entry.fields[field];
         const localizedFieldData = fieldData.getForLocale(sdk.locales.default);
 
-        if (field === 'onlyForOne') {
-            const fieldEditorInterface = sdk.editor.editorInterface?.controls?.find(
-                // @ts-ignore
-                ({ fieldId }) => fieldId === localizedFieldData.id
-            );
-
-            const fieldSdk: FieldExtensionSDK = {
-                ...sdk,
-                field: localizedFieldData,
-                locales: sdk.locales,
-                parameters: {
-                    ...sdk.parameters,
-                    instance: {
-                        ...sdk.parameters.instance,
-                        ...fieldEditorInterface?.settings,
-                    },
-                },
-            } as any;
+        const fieldEditorInterface = sdk.editor.editorInterface?.controls?.find(
             // @ts-ignore
-            return (
-                <>
-                    <Paragraph>{`Here: ${localizedFieldData.getValue()}`}</Paragraph>
-                    {/*<SingleLineEditor locales={sdk.locales} field={localizedFieldData} />*/}
-                    <FieldWrapper name={field} sdk={fieldSdk}>
-                        <BaseField sdk={fieldSdk} widgetId="singleLine" />
-                    </FieldWrapper>
-                </>
-            )
-        }
-        if (field === 'number') {
-            const fieldEditorInterface = sdk.editor.editorInterface?.controls?.find(
-                // @ts-ignore
-                ({ fieldId }) => fieldId === localizedFieldData.id
-            );
+            ({fieldId}) => fieldId === localizedFieldData.id
+        );
 
-            const fieldSdk: FieldExtensionSDK = {
-                ...sdk,
-                field: localizedFieldData,
-                locales: sdk.locales,
-                parameters: {
-                    ...sdk.parameters,
-                    instance: {
-                        ...sdk.parameters.instance,
-                        ...fieldEditorInterface?.settings,
-                    },
+        const widgetId = fieldEditorInterface?.widgetId ?? '';
+
+        const fieldSdk: FieldExtensionSDK = {
+            ...sdk,
+            field: localizedFieldData,
+            locales: sdk.locales,
+            parameters: {
+                ...sdk.parameters,
+                instance: {
+                    ...sdk.parameters.instance,
+                    ...fieldEditorInterface?.settings,
                 },
-            } as any;
+            },
+        } as any;
 
-            return (
-                <>
-                    {/*<Paragraph>{JSON.stringify(fieldEditorInterface)}</Paragraph>*/}
-                    {/*<NumberEditor field={localizedFieldData} />*/}
-                    <FieldWrapper name={field} sdk={fieldSdk}>
-                        <BaseField sdk={fieldSdk} widgetId="numberEditor" />
-                    </FieldWrapper>
-                </>
-            )
-        }
-        else {
-            return (
-                <Paragraph>no fields</Paragraph>
-            )
-        }
+        return (
+            <FieldWrapper name={field} sdk={fieldSdk}>
+                <BaseField sdk={fieldSdk} widgetId={widgetId}/>
+            </FieldWrapper>
+        )
     })
-    // switch (type) {
-    //     case 'one': return (
-    //         <>
-    //             <Paragraph>Fields for one</Paragraph>
-    //             <Dropdown
-    //                 // isOpen
-    //                 // onClose={() => setOpen(false)}
-    //                 // toggleElement={
-    //                 //     <Button
-    //                 //         size="small"
-    //                 //         buttonType="muted"
-    //                 //         indicateDropdown
-    //                 //         onClick={() => setOpen(!isOpen)}
-    //                 //     >
-    //                 //         {dropdownValue}
-    //                 //     </Button>
-    //             >
-    //                 <DropdownList>
-    //                     <DropdownListItem>start</DropdownListItem>
-    //                     <DropdownListItem>center</DropdownListItem>
-    //                     <DropdownListItem>end</DropdownListItem>
-    //                 </DropdownList>
-    //             </Dropdown>
-    //             <Paragraph>{JSON.stringify(sdk.entry.fields.objectData.getValue().style)}</Paragraph>
-    //         </>
-    //     )
-    //     case 'two': return (
-    //         <Paragraph>Fields for two</Paragraph>
-    //     )
-    //     default: return null;
-    // }
 }
 
-const CONTENT_FIELD_ID = 'name';
 const MAIN_FIELD_ID = 'type';
 const CONDITION_SETTING = "sectionTypes";
 
@@ -190,16 +117,15 @@ const Entry = (props: EditorProps) => {
           <Flex flexDirection="column" marginTop="spacingL" marginBottom="spacingXl">
               <Paragraph>Fields for this section type:</Paragraph>
               {/*  @ts-ignore*/}
-              {renderFieldsForType(conditionalFieldsData[dropdownValue], sdk)}
+              {renderFields(conditionalFieldsData[dropdownValue], sdk)}
           </Flex>
         {/*<Paragraph></Paragraph>*/}
         {/*  @ts-ignore*/}
         {/*<Paragraph>{JSON.stringify(sdk.editor.editorInterface.controls?.find(control => control.fieldId === "paragraph"))}</Paragraph>*/}
         {/*  @ts-ignore*/}
-        <Paragraph>{JSON.stringify(conditionalFieldsData[dropdownValue])}</Paragraph>
+        {/*<Paragraph>{JSON.stringify(conditionalFieldsData[dropdownValue])}</Paragraph>*/}
       </div>
   )
 };
 
 export default Entry;
-
