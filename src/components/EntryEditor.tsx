@@ -5,6 +5,9 @@ import Page from "./Page";
 import {SingleLineEditor} from "../packages/single-line";
 import {NumberEditor} from "../packages/number/NumberEditor";
 
+import {Field as BaseField, FieldWrapper} from "@contentful/default-field-editors";
+import { FieldExtensionSDK } from "@contentful/app-sdk";
+
 interface EditorProps {
   sdk: EditorExtensionSDK;
 }
@@ -18,24 +21,60 @@ const renderFieldsForType = (renderedFields: Array<any>, sdk: EditorProps.sdk) =
         const localizedFieldData = fieldData.getForLocale(sdk.locales.default);
 
         if (field === 'onlyForOne') {
-            const widgetId = sdk.editor.editorInterface?.controls?.find(
+            const fieldEditorInterface = sdk.editor.editorInterface?.controls?.find(
                 // @ts-ignore
-                ({ fieldId }) => fieldId === field
-            )
+                ({ fieldId }) => fieldId === localizedFieldData.id
+            );
 
+            const fieldSdk: FieldExtensionSDK = {
+                ...sdk,
+                field: localizedFieldData,
+                locales: sdk.locales,
+                parameters: {
+                    ...sdk.parameters,
+                    instance: {
+                        ...sdk.parameters.instance,
+                        ...fieldEditorInterface?.settings,
+                    },
+                },
+            } as any;
             // @ts-ignore
             return (
                 <>
                     <Paragraph>{`Here: ${localizedFieldData.getValue()}`}</Paragraph>
-                    <SingleLineEditor locales={sdk.locales} field={localizedFieldData} />
+                    {/*<SingleLineEditor locales={sdk.locales} field={localizedFieldData} />*/}
+                    <FieldWrapper name={field} sdk={fieldSdk}>
+                        <BaseField sdk={fieldSdk} widgetId="singleLine" />
+                    </FieldWrapper>
                 </>
             )
         }
         if (field === 'number') {
+            const fieldEditorInterface = sdk.editor.editorInterface?.controls?.find(
+                // @ts-ignore
+                ({ fieldId }) => fieldId === localizedFieldData.id
+            );
+
+            const fieldSdk: FieldExtensionSDK = {
+                ...sdk,
+                field: localizedFieldData,
+                locales: sdk.locales,
+                parameters: {
+                    ...sdk.parameters,
+                    instance: {
+                        ...sdk.parameters.instance,
+                        ...fieldEditorInterface?.settings,
+                    },
+                },
+            } as any;
+
             return (
                 <>
-                    {/*<Paragraph>{JSON.stringify(localizedFieldData)}</Paragraph>*/}
-                    <NumberEditor field={localizedFieldData} />
+                    {/*<Paragraph>{JSON.stringify(fieldEditorInterface)}</Paragraph>*/}
+                    {/*<NumberEditor field={localizedFieldData} />*/}
+                    <FieldWrapper name={field} sdk={fieldSdk}>
+                        <BaseField sdk={fieldSdk} widgetId="numberEditor" />
+                    </FieldWrapper>
                 </>
             )
         }
