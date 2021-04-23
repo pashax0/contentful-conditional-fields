@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@contentful/app-sdk": "^3.33.0",
+    "@contentful/default-field-editors": "^0.8.13",
     "@contentful/field-editor-radio": "^0.12.1",
     "@contentful/field-editor-reference": "^2.13.1",
     "@contentful/field-editor-shared": "^0.16.0",
