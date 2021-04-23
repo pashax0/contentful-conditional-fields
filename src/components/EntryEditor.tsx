@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { TextInput, Paragraph, Dropdown, DropdownList, DropdownListItem, Button, Flex } from '@contentful/forma-36-react-components';
 import { EditorExtensionSDK } from '@contentful/app-sdk';
 
@@ -11,11 +11,14 @@ interface EditorProps {
 
 type SectionType = string;
 
+const CONDITION_SETTING = "sectionTypes";
+const CONTROL_FIELD_PARAMETER = "controlField";
+
 const findControlField = (sdk: EditorProps["sdk"]) => {
     // TODO: add more conditions (only one control, only specific type)
     const controlFieldData = sdk.editor.editorInterface?.controls?.find(
         // @ts-ignore
-        control => control.settings?.controlField
+        control => control.settings?.[CONTROL_FIELD_PARAMETER]
     );
     return controlFieldData;
 }
@@ -53,15 +56,26 @@ const renderFields = (renderedFields: Array<string>, sdk: EditorProps["sdk"]) =>
     })
 }
 
-const CONDITION_SETTING = "sectionTypes";
-
 const Entry = (props: EditorProps) => {
     const { sdk } = props;
-    // const contentField = sdk.entry.fields[CONTENT_FIELD_ID];
-    const [isOpen, setOpen] = React.useState(false);
-    const [dropdownValue, updateDropdownValue] = React.useState(sdk.entry.fields.type.getValue() || 'Choose correct section type');
 
     const controlFieldId = findControlField(sdk)?.fieldId;
+
+    if (!controlFieldId) {
+        return <Paragraph>Set controlField "true" for one of fields</Paragraph>;
+    }
+
+    const defaultControlFieldValue = sdk.entry.fields[controlFieldId].getValue();
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [controlFieldValue, updateControlFieldValue] = React.useState(defaultControlFieldValue);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+        sdk.entry.fields[controlFieldId].onValueChanged(value => updateControlFieldValue(value));
+    }, [sdk.entry.fields[controlFieldId]])
+
+
     {/*  @ts-ignore*/}
     const conditionsOfMainField: Array<string> = sdk.entry.fields[controlFieldId].validations[0]["in"];
     {/*  @ts-ignore*/}
@@ -92,47 +106,17 @@ const Entry = (props: EditorProps) => {
             value={sdk.entry.fields.name.getValue()}
             onChange={e => sdk.entry.fields.name.setValue(e.target.value)}
         />
-          <Paragraph>Type</Paragraph>
-          <Dropdown
-            isOpen={isOpen}
-            onClose={() => setOpen(false)}
-            toggleElement={
-                <Button
-                    size="small"
-                    buttonType="muted"
-                    indicateDropdown
-                    onClick={() => setOpen(!isOpen)}
-                >
-                    {dropdownValue}
-                </Button>
-            }>
-              <DropdownList>
-
-                  {conditionsOfMainField.map(condition => (
-                      <DropdownListItem onClick={e => {
-                          sdk.entry.fields.type.setValue(condition);
-                          updateDropdownValue(condition);
-                          setOpen(false);
-                      }
-                      }>
-                          {condition}
-                      </DropdownListItem>
-                  ))}
-                  {/*<DropdownListItem onClick={e => sdk.entry.fields.type.setValue(sdk.entry.fields.type.getValue())}>*/}
-                  {/*    {sdk.entry.fields.type.getValue()}*/}
-                  {/*</DropdownListItem>*/}
-              </DropdownList>
-          </Dropdown>
+          {renderFields([controlFieldId], sdk)}
           <Flex flexDirection="column" marginTop="spacingL" marginBottom="spacingXl">
               <Paragraph>Fields for this section type:</Paragraph>
               {/*  @ts-ignore*/}
-              {renderFields(conditionalFieldsData[dropdownValue], sdk)}
+              {renderFields(conditionalFieldsData[controlFieldValue], sdk)}
           </Flex>
         {/*<Paragraph></Paragraph>*/}
         {/*  @ts-ignore*/}
         {/*<Paragraph>{JSON.stringify(sdk.editor.editorInterface.controls?.find(control => control.fieldId === "paragraph"))}</Paragraph>*/}
         {/*  @ts-ignore*/}
-        {/*<Paragraph>{JSON.stringify(findControlField(sdk))}</Paragraph>*/}
+        <Paragraph>{JSON.stringify(controlFieldValue)}</Paragraph>
       </div>
   )
 };
