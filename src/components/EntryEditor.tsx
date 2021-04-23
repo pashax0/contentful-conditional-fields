@@ -11,8 +11,16 @@ interface EditorProps {
 
 type SectionType = string;
 
-{/*  @ts-ignore*/}
-const renderFields = (renderedFields: Array<string>, sdk: EditorProps.sdk) => {
+const findControlField = (sdk: EditorProps["sdk"]) => {
+    // TODO: add more conditions (only one control, only specific type)
+    const controlFieldData = sdk.editor.editorInterface?.controls?.find(
+        // @ts-ignore
+        control => control.settings?.controlField
+    );
+    return controlFieldData;
+}
+
+const renderFields = (renderedFields: Array<string>, sdk: EditorProps["sdk"]) => {
     return renderedFields.map(field => {
         const fieldData = sdk.entry.fields[field];
         const localizedFieldData = fieldData.getForLocale(sdk.locales.default);
@@ -45,7 +53,6 @@ const renderFields = (renderedFields: Array<string>, sdk: EditorProps.sdk) => {
     })
 }
 
-const MAIN_FIELD_ID = 'type';
 const CONDITION_SETTING = "sectionTypes";
 
 const Entry = (props: EditorProps) => {
@@ -53,8 +60,10 @@ const Entry = (props: EditorProps) => {
     // const contentField = sdk.entry.fields[CONTENT_FIELD_ID];
     const [isOpen, setOpen] = React.useState(false);
     const [dropdownValue, updateDropdownValue] = React.useState(sdk.entry.fields.type.getValue() || 'Choose correct section type');
+
+    const controlFieldId = findControlField(sdk)?.fieldId;
     {/*  @ts-ignore*/}
-    const conditionsOfMainField: Array<string> = sdk.entry.fields[MAIN_FIELD_ID].validations[0]["in"];
+    const conditionsOfMainField: Array<string> = sdk.entry.fields[controlFieldId].validations[0]["in"];
     {/*  @ts-ignore*/}
     const controls: Array<any> = sdk.editor.editorInterface.controls;
 
@@ -123,7 +132,7 @@ const Entry = (props: EditorProps) => {
         {/*  @ts-ignore*/}
         {/*<Paragraph>{JSON.stringify(sdk.editor.editorInterface.controls?.find(control => control.fieldId === "paragraph"))}</Paragraph>*/}
         {/*  @ts-ignore*/}
-        {/*<Paragraph>{JSON.stringify(conditionalFieldsData[dropdownValue])}</Paragraph>*/}
+        {/*<Paragraph>{JSON.stringify(findControlField(sdk))}</Paragraph>*/}
       </div>
   )
 };
