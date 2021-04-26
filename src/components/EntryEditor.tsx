@@ -1,7 +1,6 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import { Paragraph, Flex } from '@contentful/forma-36-react-components';
 import { EditorExtensionSDK } from '@contentful/app-sdk';
-
 import {Field as BaseField, FieldWrapper} from "@contentful/default-field-editors";
 import { FieldExtensionSDK } from "@contentful/app-sdk";
 import 'codemirror/lib/codemirror.css';
@@ -11,7 +10,11 @@ interface EditorProps {
   sdk: EditorExtensionSDK;
 }
 
-type fieldId = string;
+interface EditorInterfaceControl {
+    settings: object
+}
+
+type fieldType = string;
 
 const CONDITION_SETTING = "sectionTypes";
 const CONTROL_FIELD_PARAMETER = "controlField";
@@ -21,7 +24,7 @@ const findControlField = (sdk: EditorProps["sdk"]) => {
     // TODO: add more conditions (only one control, only specific type)
     const controlFieldData = sdk.editor.editorInterface?.controls?.find(
         // @ts-ignore
-        control => control.settings?.[CONTROL_FIELD_PARAMETER]
+        (control: EditorInterfaceControl) => control.settings?.[CONTROL_FIELD_PARAMETER]
     );
 
     return controlFieldData;
@@ -78,26 +81,26 @@ const renderFields = (renderedFields: Array<string>, sdk: EditorProps["sdk"]) =>
 const Entry = (props: EditorProps) => {
     const { sdk } = props;
     {/*  @ts-ignore*/}
-    const controlFieldId: fieldId = findControlField(sdk)?.fieldId;
+    const controlFieldId: fieldType = findControlField(sdk)?.fieldId;
     {/*  @ts-ignore*/}
     const controlField = sdk.entry.fields[controlFieldId];
     const informationFields = findInformationFields(sdk);
 
-    const defaultControlFieldValue = controlField.getValue();
+    const defaultControlFieldValue = controlField?.getValue();
 
-    const [controlFieldValue, updateControlFieldValue] = React.useState(defaultControlFieldValue);
+    const [controlFieldValue, updateControlFieldValue] = useState(defaultControlFieldValue);
 
     useEffect(() => {
-        controlField.onValueChanged((value: any) => updateControlFieldValue(value));
+        controlField?.onValueChanged((value: any) => updateControlFieldValue(value));
     }, [controlField])
 
 
     {/*  @ts-ignore*/}
-    const conditionsOfMainField: Array<string> = sdk.entry.fields[controlFieldId].validations[0]["in"];
+    const conditionsOfMainField: Array<string> = sdk.entry.fields[controlFieldId]?.validations[0]["in"];
     {/*  @ts-ignore*/}
     const controls: Array<any> = sdk.editor.editorInterface.controls;
 
-    const conditionalFieldsData = conditionsOfMainField.reduce((obj: object, condition: string) => {
+    const conditionalFieldsData = conditionsOfMainField?.reduce((obj: object, condition: string) => {
         const fieldsWithCondition = controls.filter(control => {
             const controlConditionSettingsString: string = control.settings?.[CONDITION_SETTING];
             const controlConditionSettings: Array<string> = controlConditionSettingsString?.split(", ");
