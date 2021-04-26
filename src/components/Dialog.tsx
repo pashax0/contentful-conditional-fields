@@ -7,7 +7,12 @@ interface DialogProps {
 }
 
 const Dialog = (props: DialogProps) => {
-  return <Paragraph>Hello Dialog Component</Paragraph>;
+  return (
+      <>
+        <Paragraph>Hello Dialog Component</Paragraph>
+        <Paragraph>{JSON.stringify(props)}</Paragraph>
+      </>
+  );
 };
 
 export default Dialog;
