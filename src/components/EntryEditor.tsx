@@ -4,6 +4,8 @@ import { EditorExtensionSDK } from '@contentful/app-sdk';
 
 import {Field as BaseField, FieldWrapper} from "@contentful/default-field-editors";
 import { FieldExtensionSDK } from "@contentful/app-sdk";
+import 'codemirror/lib/codemirror.css';
+import '@contentful/forma-36-react-components/dist/styles.css';
 
 interface EditorProps {
   sdk: EditorExtensionSDK;
@@ -47,6 +49,8 @@ const renderFields = (renderedFields: Array<string>, sdk: EditorProps["sdk"]) =>
             // @ts-ignore
             ({fieldId}) => fieldId === localizedFieldData.id
         );
+// @ts-ignore
+        const fieldTypeName = sdk.contentType.fields.find((fieldData: object) => fieldData.id === field).name;
 
         const widgetId = fieldEditorInterface?.widgetId ?? '';
 
@@ -64,7 +68,7 @@ const renderFields = (renderedFields: Array<string>, sdk: EditorProps["sdk"]) =>
         } as any;
 
         return (
-            <FieldWrapper name={field} sdk={fieldSdk}>
+            <FieldWrapper name={fieldTypeName} sdk={fieldSdk}>
                 <BaseField sdk={fieldSdk} widgetId={widgetId}/>
             </FieldWrapper>
         )
