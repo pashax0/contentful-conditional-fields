@@ -2,6 +2,7 @@
   "name": "conditional-fields",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://pashax0.github.io/conditional-fields/",
   "dependencies": {
     "@contentful/app-sdk": "^3.33.0",
     "@contentful/default-field-editors": "^0.8.13",
@@ -31,7 +32,9 @@
     "start": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -48,5 +51,8 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "."
+  "homepage": ".",
+  "devDependencies": {
+    "gh-pages": "^3.1.0"
+  }
 }
