@@ -25,3 +25,4 @@ yarn-error.log*
 
 # Custom files and directories
 .idea
+/backups

@@ -124,8 +124,6 @@ const Entry = (props: EditorProps) => {
               {renderFields(conditionalFieldsData[controlFieldValue], sdk)}
             </Flex>
         )}
-        {/*  @ts-ignore*/}
-        {/*<Paragraph>{JSON.stringify(controlFieldValue)}</Paragraph>*/}
       </div>
   )
 };
